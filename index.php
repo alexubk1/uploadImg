@@ -6,51 +6,37 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <link href="style.css" rel="stylesheet">
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <!------ Include the above in your HEAD tag ---------->
-
 </head>
 
 <body>
-
-
-
-<form action="upload.php" method="post" enctype="multipart/form-data">
-    Select image to upload:
-    <input type="file" name="files[]" id="fileToUpload" multiple>
-    <input type="submit" value="Upload Image" name="submit">
+<form action="upload.php" enctype="multipart/form-data" method="post">
+    <div>
+        <label for='upload'>Add Attachments:</label>
+        <input type="hidden" name="MAX_FILE_SIZE" value="1000000"/>
+        <input id='upload' name="upload[]" type="file" multiple="multiple" />
+    </div>
+    <p><input type="submit" name="submit" value="Submit"></p>
 </form>
 
-        <?php
-            $allImages = scandir('upload/');
-            $images = array_diff($allImages, array('.','..'));
-        ?>
+
+
 
 <?php
-if (!empty($_GET['image'])) {
-    if (file_exists('upload/'.$_GET['image'])) {
-        $deleteResult = unlink('upload/'.$_GET['image']);
-        header('Location: index.php');
+$directory = "upload/";
+if (isset($_GET['delete'])) {
+    if (file_exists($_GET['delete'])) {
+        unlink($_GET['delete']);
     }
+}
+$images = glob($directory . "*.{jpg,png,gif,jpeg}", GLOB_BRACE);
+foreach($images as $image) {
+     ?>
+    <img width="20%" class="img-thumbnail" src="<?php echo $image;?>">
+    <a href="?delete=<?php echo $image ?>">delete</a><?php
 }
 ?>
 
-<?php foreach ($images as $image): ?>
-<div class="col-sm-6 col-md-4">
-    <div class="thumbnail">
-        <img src="<?= 'upload/'.$image ?>" alt="<?= $image ?>">
-        <div class="caption">
-            <h3><?= $image ?></h3>
-            <p><a href="?image=<?= $image ?>" class="btn btn-danger" role="button">Supprimer</a></p>
-        </div>
-    </div>
-</div>
-<?php endforeach; ?>
-</div>
 
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </body>
 </html>

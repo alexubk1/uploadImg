@@ -1,34 +1,22 @@
 <?php
-extract($_POST);
-$error=array();
-$extension=array("jpeg","jpg","png","gif");
-foreach($_FILES["files"]["tmp_name"] as $key=>$tmp_name)
-{
-$file_name=$_FILES["files"]["name"][$key];
-$file_tmp=$_FILES["files"]["tmp_name"][$key];
-$ext=pathinfo($file_name,PATHINFO_EXTENSION);
+if(isset($_POST['submit'])) {
+        for ($i = 0; $i < count($_FILES['upload']['name']); $i++) {
+            $tmpFilePath = $_FILES['upload']['tmp_name'][$i];
+            $types = ['image/gif', 'image/png', 'image/jpeg', 'image/jpg'];
 
-
-
-if(in_array($ext,$extension))
-{
-if(!file_exists("upload/".$txtGalleryName."/".$file_name))
-{
-move_uploaded_file($file_tmp=$_FILES["files"]["tmp_name"][$key],"upload/".$txtGalleryName."/".$file_name);
+            if ($_FILES['upload']['size'][$i] > 1000000) {
+                $errors['size'] = "le fichier dépasse la taille autorisée";
+            }
+            elseif (!in_array($_FILES['upload']['type'][$i], $types)) {
+                $errors['type'] = "type de fichier incorrect";
+            }
+            else
+                {
+                $extensions = pathinfo($_FILES['upload']['name'][$i], PATHINFO_EXTENSION);
+                $fileName = uniqid('image') . '.' . $extensions;
+                $uploadDir = 'upload/' . $fileName;
+                $uploadResult = move_uploaded_file($_FILES['upload']['tmp_name'][$i], $uploadDir);
+            }
+        }
 }
-
-else
-{
-$filename=basename($file_name,$ext);
-$newFileName=$filename.time().".".$ext;
-move_uploaded_file($file_tmp=$_FILES["files"]["tmp_name"][$key],"upload/".$txtGalleryName."/".$newFileName);
-}
-}
-else
-{
-array_push($error,"$file_name, ");
-}
-}
-
-header('Location: index.php');
-?>
+header('location: index.php');
